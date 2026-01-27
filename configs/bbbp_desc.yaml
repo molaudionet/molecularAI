@@ -1,0 +1,19 @@
+train_mode: desc
+
+dataset:
+  type: csv
+  path: data/bbbp.csv
+  id_col: num
+  smiles_col: smiles
+  label_cols: [p_np]
+  task_types: "*:classification"
+
+run:
+  seed: 0
+  limit: 2051
+  split: { train: 0.8, val: 0.1, test: 0.1 }
+
+features:
+  featurizer: rdkit_desc
+  cache_dir: cache/bbbp_desc
+
