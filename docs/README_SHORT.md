@@ -2,10 +2,6 @@
 
 Multi-modal molecular AI using audio-based molecular representation for drug discovery.
 
-**Paper:** "Molecular Sonification: A Multi-Modal Approach for Enhanced AI in Drug Discovery"  
-**Authors:** Charles J. Zhou (UChicago) & Emily R. Zhou (Sound of Molecules / UIUC)  
-**Published:** Medicinal Chemistry Research (2025)
-
 ## Quick Start
 
 ```bash
@@ -53,6 +49,6 @@ MIT License (code) | US Patent 9,018,506 (sonification technology)
 
 ## Contact
 
-- Charles Zhou: zhou@uchicago.edu
+- Jianping Zhou: zhou@uchicago.edu
 - Emily Zhou: erzhou2@illinois.edu
 - Web: soundofmolecules.com
