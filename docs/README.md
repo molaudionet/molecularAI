@@ -41,15 +41,13 @@ They're separate and both apply.
 
 This repository contains the official implementation of our molecular AI framework that integrates **molecular sonification technology** with transfer learning from voice AI models to achieve mechanistic understanding in drug discovery.
 
-## 📄 Paper
+##  Paper
 
-**Authors:** Charles Jianping Zhou (University of Chicago) & Emily R. Zhou (Sound of Molecules LLC / UIUC)
-
-**Published in:** *Medicinal Chemistry Research* (2025)
+**Authors:** Jianping Zhou & Emily R. Zhou (Sound of Molecules LLC / UIUC)
 
 **Key Innovation:** Achieving 10×-100× faster training through audio-based molecular representation and transfer learning from pre-trained voice AI models (Wav2Vec 2.0, Whisper).
 
-## 🎯 Key Features
+##  Key Features
 
 - **Molecular Sonification:** Patent-protected technology (USP 9,018,506) that maps molecular properties to audio signals
 - **Multi-Modal Learning:** Integrates audio, structure, spectroscopy, and physicochemical descriptors
