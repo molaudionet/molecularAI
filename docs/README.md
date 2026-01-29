@@ -2,7 +2,40 @@
 
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![arXiv](https://img.shields.io/badge/arXiv-XXXX.XXXXX-b31b1b.svg)](https://arxiv.org/abs/XXXX.XXXXX)
+
+## Important Legal Clarifications
+
+### License Scope & Precedence
+
+This repository's MIT License applies **only** to the software code herein. 
+It operates alongside, and does not override:
+
+1. **Patent Rights:** U.S. Patents 9,018,506 and 10,381,108 protecting 
+   molecular sonification technology remain in full force. Commercial use 
+   requires patent license.
+
+2. **Website Terms:** If you access our technology via soundofmolecules.com, 
+   those Terms of Service apply to that service.
+
+3. **Other Repositories:** Each code repository has its own license - 
+   check individual LICENSE files.
+
+### What You CAN Do (MIT License):
+Use this code for research  
+Modify and distribute the code  
+Use in academic publications  
+Learn from the implementation  
+
+### What Requires Additional Permission:
+Commercial products using molecular sonification technology  
+Commercial services implementing patented methods  
+Integration into proprietary commercial software (patent license needed)  
+
+### Summary:
+**Code = MIT Licensed (free)**  
+**Technology = Patent Protected (commercial license required)**  
+
+They're separate and both apply.
 
 **Molecular Sonification: A Multi-Modal Approach for Enhanced AI in Drug Discovery**
 
@@ -111,7 +144,7 @@ CN1C=NC2=C1C(=O)N(C(=O)N2C)C,0
 ...
 ```
 
-## 🎵 Molecular Sonification
+## Molecular Sonification
 
 The core innovation of this framework is **molecular sonification** - converting molecular structures to audio signals:
 
@@ -136,7 +169,7 @@ print(audio_features.shape)
 3. **Wav2Vec 2.0 Processing**: Extracts 768-dimensional embeddings
 4. **Multi-Modal Fusion**: Combines with structural and physicochemical features
 
-## 🧪 Experiments
+##  Experiments
 
 ### Run Individual Experiments
 
@@ -219,7 +252,7 @@ model = MultiModalFusionModel(
 )
 ```
 
-## 📖 Citation
+##  Citation
 
 If you use this code or data in your research, please cite our paper:
 
@@ -245,11 +278,9 @@ If you use this code or data in your research, please cite our paper:
 }
 ```
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 This work is dedicated to **Professor Richard B. Silverman** on his 80th birthday and 50 years at Northwestern University. We thank Professor Silverman for his mentorship and pioneering work in mechanism-based drug design.
-
-We honor the memory of **Professor Philip E. Eaton** (1936-2023), whose cubyl chemistry inspired our understanding of molecular mechanisms.
 
 Emily R. Zhou is grateful for the University of Illinois iVenture Accelerator grant supporting Sound of Molecules LLC.
 
@@ -259,18 +290,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Note:** Molecular sonification technology is protected by US Patent 9,018,506. Commercial use requires licensing from Sound of Molecules LLC.
 
-## 🔗 Links
+##  Links
 
 - **Paper:** [Medicinal Chemistry Research](https://link.springer.com/) (DOI: TBD)
 - **Sound of Molecules:** [Website](https://soundofmolecules.com)
 - **Data Repository:** [Zenodo](https://doi.org/10.5281/zenodo.8425713)
 
-## 📧 Contact
+##  Contact
 
-- **Charles Jianping Zhou** - University of Chicago - zhou@uchicago.edu
+- **Jianping Zhou** - University of Chicago - zhou@uchicago.edu
 - **Emily R. Zhou** - Sound of Molecules LLC / UIUC - erzhou2@illinois.edu
 
-## 🐛 Issues & Contributions
+## Issues & Contributions
 
 We welcome contributions! Please:
 1. Fork the repository
@@ -281,13 +312,13 @@ We welcome contributions! Please:
 
 For bugs or feature requests, please open an issue on GitHub.
 
-## 📝 Updates
+##  Updates
 
-- **January 2025:** Initial release with Tox21, BBBP, ESOL benchmarks
+- **January 2026:** Initial release with Tox21, BBBP, ESOL benchmarks
 - **Future:** Additional datasets (HIV, MUV, SIDER), stereochemistry module, real-time sonification tool
 
 ---
 
-**Made with 🎵 by Sound of Molecules**
+**Made with by Sound of Molecules**
 
-*Transforming molecules into music, music into understanding.*
+*Transforming molecules into audio, audio into understanding.*
