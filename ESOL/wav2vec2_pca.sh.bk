@@ -1,0 +1,2 @@
+python run_wav2vec2.py fit --config configs/esol_fuse_pca.yaml --outdir runs/esol_fuse_pca
+

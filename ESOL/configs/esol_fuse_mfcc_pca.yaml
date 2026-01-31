@@ -1,0 +1,49 @@
+# ESOL – Fusion with MFCC audio + (optional) PCA before fusion
+
+run:
+  seed: 42
+  split:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+
+train_mode: "fusion"
+
+dataset:
+  path: "data/esol.csv"
+  smiles_col: "smiles"
+  id_col: "Compound ID"
+  label_cols:
+    - "measured log solubility in mols per litre"
+  task_types:
+    "measured log solubility in mols per litre": "regression"
+
+features:
+  mode: "fusion"
+  cache_dir: "cache/esol_fuse_mfcc_pca"   # ✅ REQUIRED by run.py
+
+  audio:
+    enabled: true
+
+    # NOTE: in your MFCC featurizer I read `generate` OR `generation`, so either is fine.
+    generate:
+      sonify_script: "featurizers/sonify_smiles.py"
+      tmp_dir: "cache/tmp_audio"
+      sample_rate: 16000
+      duration: 2.0
+
+    embed:
+      cache_path: "cache/esol_fuse_mfcc_pca/audio_embeddings.npy"
+      n_mfcc: 20
+      n_fft: 1024
+      hop_length: 256
+      roll_percent: 0.85
+
+# Optional, but recommended for stability
+fusion:
+  audio_pca_components: 16
+  audio_pca_whiten: false
+
+metrics:
+  primary: "r2"
+

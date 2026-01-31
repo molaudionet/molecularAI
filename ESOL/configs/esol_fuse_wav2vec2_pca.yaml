@@ -1,0 +1,49 @@
+# ESOL – Fusion with wav2vec2 audio + PCA
+# Purpose: test whether dimensionality reduction stabilizes wav2vec2 fusion
+
+run:
+  seed: 42
+  split:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+
+train_mode: "fusion"
+
+dataset:
+  path: "data/esol.csv"
+  smiles_col: "smiles"
+  id_col: "Compound ID"
+  label_cols:
+    - "measured log solubility in mols per litre"
+
+  task_types:
+    "measured log solubility in mols per litre": "regression"
+
+features:
+  mode: "fusion"
+  # 🔑 REQUIRED by run_wav2vec2.py
+  cache_dir: "cache/esol_fuse_wav2vec2_pca"
+
+  audio:
+    enabled: true
+
+    generate:
+      sonify_script: "featurizers/sonify_smiles.py"
+      tmp_dir: "cache/tmp_audio"
+      sample_rate: 16000
+      duration: 2.0
+
+    embed:
+      model_name: "facebook/wav2vec2-base-960h"
+      cache_path: "cache/esol_fuse_wav2vec2_pca/audio_embeddings.npy"
+      device: "cpu"
+
+# 🔑 PCA FOR WAV2VEC2 (THIS IS THE EXPERIMENT)
+fusion:
+  audio_pca_components: 32     # try 16, 32, 64
+  audio_pca_whiten: false
+
+metrics:
+  primary: "r2"
+

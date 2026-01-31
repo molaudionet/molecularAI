@@ -1,0 +1,112 @@
+"""
+featurizers/sonify_smiles.py
+Patent-compliant molecular sonification (USP 9,018,506)
+Maps atomic properties → audible frequencies (20Hz-20kHz)
+"""
+from rdkit import Chem
+import numpy as np
+import soundfile as sf
+import os
+
+# Electronegativity lookup (Pauling scale) - FIXES NameError
+EN_VALUES = {
+    'H': 2.20, 'C': 2.55, 'N': 3.04, 'O': 3.44, 'F': 3.98,
+    'P': 2.19, 'S': 2.58, 'Cl': 3.16, 'Br': 2.96, 'I': 2.66,
+    'Na': 0.93, 'K': 0.82, 'Ca': 1.00, 'Mg': 1.31, 'Li': 0.98,
+    'B': 2.04, 'Si': 1.90, 'As': 2.18, 'Se': 2.55, 'Te': 2.10
+}
+
+def get_electronegativity(symbol):
+    """FIX: Properly defined helper function (was missing in your version)"""
+    return EN_VALUES.get(symbol, 2.0)  # Default to carbon-like EN
+
+def atomic_properties_to_frequency(atom):
+    """Map atomic properties to audible frequencies per patent"""
+    mass = atom.GetMass()
+    symbol = atom.GetSymbol()
+    electronegativity = get_electronegativity(symbol)  # Now properly defined
+    
+    # Patent mapping: atomic mass → base frequency (20Hz-20kHz)
+    base_freq = 100 + (mass / 300) * 19900
+    
+    # Patent mapping: electronegativity → harmonic complexity
+    harmonics = max(1, min(8, int(electronegativity * 2)))
+    
+    return base_freq, harmonics
+
+def bond_to_amplitude(bond):
+    """Map bond polarity to amplitude envelope"""
+    # Simplified polarity estimate: heteroatom bonds = more polar
+    a1 = bond.GetBeginAtom()
+    a2 = bond.GetEndAtom()
+    is_hetero = (a1.GetAtomicNum() != 6) or (a2.GetAtomicNum() != 6)
+    return 0.7 if is_hetero else 0.3
+
+def smiles_to_wav(smiles: str, out_path: str, duration: float = 1.0):
+    """
+    Convert SMILES to scientifically meaningful audio waveform.
+    Patent mapping: atomic mass→pitch, EN→timbre, bond polarity→amplitude.
+    """
+    mol = Chem.MolFromSmiles(smiles)
+    if mol is None or mol.GetNumAtoms() == 0:
+        # Invalid molecule → generate silence
+        waveform = np.zeros(int(16000 * duration), dtype=np.float32)
+        sf.write(out_path, waveform, 16000)
+        return
+
+    sample_rate = 16000
+    total_samples = int(sample_rate * duration)
+    waveform = np.zeros(total_samples, dtype=np.float32)
+    
+    atoms = list(mol.GetAtoms())
+    n_atoms = len(atoms)
+    
+    # Allocate time slots for each atom (evenly spaced)
+    atom_duration = duration / max(n_atoms, 1)
+    
+    for i, atom in enumerate(atoms):
+        # Get frequency and harmonic complexity from atomic properties
+        base_freq, n_harmonics = atomic_properties_to_frequency(atom)
+        
+        # Generate atom "note" (harmonic series)
+        note_samples = int(sample_rate * atom_duration * 0.8)
+        if note_samples <= 0:
+            continue
+            
+        t = np.linspace(0, atom_duration * 0.8, note_samples, endpoint=False)
+        atom_wave = np.zeros(note_samples)
+        
+        # Generate harmonic series (fundamental + overtones)
+        for h in range(1, n_harmonics + 1):
+            atom_wave += (1.0 / h) * np.sin(2 * np.pi * base_freq * h * t)
+        
+        # Patent mapping: bond polarity → amplitude envelope
+        bonds = atom.GetBonds()
+        avg_amp = 0.5
+        if bonds:
+            amplitudes = [bond_to_amplitude(b) for b in bonds]
+            avg_amp = np.mean(amplitudes)
+        
+        # Apply simple envelope (attack/decay)
+        env = np.ones(note_samples)
+        attack = max(1, int(note_samples * 0.1))
+        decay = max(1, int(note_samples * 0.2))
+        env[:attack] = np.linspace(0, 1, attack)
+        env[-decay:] = np.linspace(1, 0, decay)
+        atom_wave *= env * (0.3 + avg_amp * 0.7)
+        
+        # Position in waveform (time-proportional to atom position)
+        start_idx = int(i * total_samples / n_atoms)
+        end_idx = min(start_idx + note_samples, total_samples)
+        
+        # Mix into main waveform (avoid clipping)
+        if end_idx > start_idx:
+            waveform[start_idx:end_idx] += atom_wave[:end_idx-start_idx] * 0.4
+    
+    # Normalize to [-0.9, 0.9]
+    max_amp = np.max(np.abs(waveform))
+    if max_amp > 0.01:
+        waveform = waveform * 0.9 / max_amp
+    
+    # Save WAV file
+    sf.write(out_path, waveform.astype(np.float32), sample_rate)

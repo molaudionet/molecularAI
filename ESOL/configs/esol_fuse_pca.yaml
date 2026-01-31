@@ -1,0 +1,46 @@
+# ESOL Dataset – Fusion Mode with PCA-balanced Audio
+# RDKit descriptors + molecular sonification (audio PCA)
+
+run:
+  seed: 42
+  split:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+
+train_mode: "fusion"
+
+dataset:
+  path: "data/esol.csv"
+  smiles_col: "smiles"
+  id_col: "Compound ID"
+  label_cols:
+    - "measured log solubility in mols per litre"
+
+  task_types:
+    "measured log solubility in mols per litre": "regression"
+
+features:
+  audio:
+    enabled: true
+    generate:
+      sonify_script: "tools/sonify_smiles.py"
+      tmp_dir: "cache/tmp_audio"
+      sample_rate: 16000
+      duration: 2.0
+    embed:
+      cache_path: "cache/esol_fuse_pca/audio_embeddings.npy"
+      n_mfcc: 20
+      n_fft: 1024
+      hop_length: 256
+      roll_percent: 0.85
+
+fusion:
+  audio_pca_components: 32   # MFCC is already low-dim; 16 or 32 usually enough
+  audio_pca_whiten: false
+
+model:
+  type: "ridge"
+
+metrics:
+  primary: "r2"

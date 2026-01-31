@@ -1,0 +1,49 @@
+{
+  "run": {
+    "seed": 42,
+    "split": {
+      "train": 0.8,
+      "val": 0.1,
+      "test": 0.1
+    }
+  },
+  "train_mode": "fusion",
+  "dataset": {
+    "path": "data/esol.csv",
+    "smiles_col": "smiles",
+    "id_col": "Compound ID",
+    "label_cols": [
+      "measured log solubility in mols per litre"
+    ],
+    "task_types": {
+      "measured log solubility in mols per litre": "regression"
+    }
+  },
+  "features": {
+    "mode": "fusion",
+    "cache_dir": "cache/esol_fuse_pca",
+    "audio": {
+      "enabled": true,
+      "generate": {
+        "sample_rate": 16000,
+        "duration": 2.0,
+        "mapping_method": "property_based"
+      },
+      "embed": {
+        "model_name": "facebook/wav2vec2-base-960h",
+        "cache_path": "cache/esol_fuse_pca/audio_embeddings.npy",
+        "device": "cpu"
+      }
+    }
+  },
+  "fusion": {
+    "audio_pca_components": 64,
+    "audio_pca_whiten": false
+  },
+  "model": {
+    "type": "ridge"
+  },
+  "metrics": {
+    "primary": "r2"
+  }
+}

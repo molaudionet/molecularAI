@@ -1,0 +1,45 @@
+{
+  "run": {
+    "seed": 42,
+    "split": {
+      "train": 0.8,
+      "val": 0.1,
+      "test": 0.1
+    }
+  },
+  "train_mode": "audio",
+  "dataset": {
+    "path": "data/esol.csv",
+    "smiles_col": "smiles",
+    "id_col": "Compound ID",
+    "label_cols": [
+      "measured log solubility in mols per litre"
+    ],
+    "task_types": {
+      "measured log solubility in mols per litre": "regression"
+    }
+  },
+  "features": {
+    "mode": "audio",
+    "cache_dir": "cache/esol_audio_mfcc",
+    "audio": {
+      "enabled": true,
+      "generate": {
+        "sonify_script": "featurizers/sonify_smiles.py",
+        "tmp_dir": "cache/tmp_audio",
+        "sample_rate": 16000,
+        "duration": 2.0
+      },
+      "embed": {
+        "cache_path": "cache/esol_audio_mfcc/audio_embeddings.npy",
+        "n_mfcc": 20,
+        "n_fft": 1024,
+        "hop_length": 256,
+        "roll_percent": 0.85
+      }
+    }
+  },
+  "metrics": {
+    "primary": "r2"
+  }
+}

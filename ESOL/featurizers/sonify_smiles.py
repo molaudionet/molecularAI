@@ -1,84 +1,61 @@
-from __future__ import annotations
-
-from typing import Optional
+import argparse
 import numpy as np
-from scipy.io import wavfile
+from pathlib import Path
+import wave
 
+def smiles_to_seed(smiles: str) -> int:
+    return abs(hash(smiles)) % (2**31 - 1)
 
-def _note_freq(semitone_from_a4: int) -> float:
-    # A4 = 440 Hz
-    return 440.0 * (2.0 ** (semitone_from_a4 / 12.0))
+def synth_tone(freq: float, duration: float, sr: int = 16000):
+    t = np.linspace(0, duration, int(sr * duration), endpoint=False)
+    return np.sin(2 * np.pi * freq * t).astype(np.float32)
 
+def write_wav(path: str, audio: np.ndarray, sr: int = 16000):
+    audio = np.clip(audio, -1.0, 1.0)
+    pcm = (audio * 32767.0).astype(np.int16)
+    with wave.open(path, "wb") as wf:
+        wf.setnchannels(1)
+        wf.setsampwidth(2)
+        wf.setframerate(sr)
+        wf.writeframes(pcm.tobytes())
 
-def smiles_to_wav(
-    smiles: str,
-    out_path: str,
-    duration_s: float = 5.0,
-    sr: int = 16000,
-) -> Optional[str]:
+def sonify_smiles(smiles: str, sr: int = 16000, duration: float = 2.0) -> np.ndarray:
+    seed = smiles_to_seed(smiles)
+    base_freq = 220.0 + (seed % 880)  # [220, 1099]
+    y = synth_tone(base_freq, duration, sr=sr)
+    y += 0.35 * synth_tone(base_freq * 2.0, duration, sr=sr)
+    y += 0.15 * synth_tone(base_freq * 3.0, duration, sr=sr)
+
+    # simple attack envelope
+    env = np.linspace(0.0, 1.0, len(y), endpoint=False)
+    y *= env
+    y = (y / (np.max(np.abs(y)) + 1e-9)).astype(np.float32)
+    return y
+
+def smiles_to_wav(smiles: str, out_wav: str, sr: int = 16000, duration: float = 2.0):
     """
-    Deterministic, rule-based demo sonification:
-    - Parse characters from SMILES
-    - Map characters -> pitch classes
-    - Render a monophonic note stream
+    Backward-compatible helper expected by featurizers/audio_featurizer.py.
+    Writes a WAV file to out_wav for the given SMILES.
     """
-    if not smiles or not isinstance(smiles, str):
-        return None
+    out = Path(out_wav)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    y = sonify_smiles(smiles, sr=sr, duration=duration)
+    write_wav(str(out), y, sr=sr)
 
-    # Basic character->semitone mapping (demo)
-    # Keep it simple and stable.
-    chars = list(smiles.strip())
-    if len(chars) == 0:
-        return None
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--smiles", required=True)
+    ap.add_argument("--out", required=True)
+    ap.add_argument("--sr", type=int, default=16000)
+    ap.add_argument("--duration", type=float, default=2.0)
+    args = ap.parse_args()
 
-    # Map SMILES chars to 0..11 pitch class
-    # Use ASCII code mod 12; deterministic and universal for demo.
-    pitch_classes = [(ord(c) % 12) for c in chars]
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
 
-    # Timing: split total duration into N notes (cap N)
-    max_notes = 64
-    pitch_classes = pitch_classes[:max_notes]
-    n = len(pitch_classes)
-    note_dur = duration_s / n
+    y = sonify_smiles(args.smiles, sr=args.sr, duration=args.duration)
+    write_wav(str(out), y, sr=args.sr)
 
-    t = np.arange(int(sr * duration_s), dtype=np.float32) / sr
-    y = np.zeros_like(t, dtype=np.float32)
-
-    # Synthesis params
-    base_octave = 0  # shift up/down if desired
-    amp = 0.2
-
-    idx = 0
-    for pc in pitch_classes:
-        start = int(idx * sr * note_dur)
-        end = int((idx + 1) * sr * note_dur)
-        if end <= start:
-            continue
-
-        # Map pitch class to a musical semitone offset around A4
-        # Put pitches roughly between 220-880 Hz for speech-audio compatibility
-        semitone = (pc - 9) + 12 * base_octave  # pc 9 => A
-        f = _note_freq(semitone)
-
-        tt = np.arange(end - start, dtype=np.float32) / sr
-        tone = np.sin(2 * np.pi * f * tt).astype(np.float32)
-
-        # short fade to reduce clicks
-        fade = int(0.005 * sr)
-        if fade > 1 and len(tone) > 2 * fade:
-            w = np.ones_like(tone)
-            w[:fade] = np.linspace(0, 1, fade)
-            w[-fade:] = np.linspace(1, 0, fade)
-            tone *= w
-
-        y[start:end] += amp * tone
-        idx += 1
-
-    # normalize
-    mx = np.max(np.abs(y))
-    if mx > 0:
-        y = y / mx * 0.9
-
-    wavfile.write(out_path, sr, (y * 32767).astype(np.int16))
-    return out_path
+if __name__ == "__main__":
+    main()
 
