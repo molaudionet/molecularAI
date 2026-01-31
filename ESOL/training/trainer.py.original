@@ -1,7 +1,7 @@
-# training/trainer.py -- REPLACE ENTIRE FILE
+# training/trainer.py — REPLACE ENTIRE FILE
 """
 Minimal trainer for sklearn-based models (classification + regression).
-NO PyTorch dependencies -- single-shot training matches paper methodology.
+NO PyTorch dependencies — single-shot training matches paper methodology.
 """
 import numpy as np
 from models.head import train_logreg_multitask, predict_proba
@@ -36,7 +36,7 @@ def fit(cfg, X, Y, M, splits):
     val_idx = splits["val"]
     test_idx = splits["test"]
 
-    #  SINGLE-SHOT TRAINING (paper methodology)
+    # ✅ SINGLE-SHOT TRAINING (paper methodology)
     print("Training multi-task model...")
     model = train_logreg_multitask(
         X=X[train_idx],
@@ -47,7 +47,7 @@ def fit(cfg, X, Y, M, splits):
         max_iter=cfg.get("train", {}).get("max_iter", 2000),
         min_n=cfg.get("train", {}).get("min_n", 10)
     )
-    print(" Training complete")
+    print("✓ Training complete")
 
     results = {
         "train": evaluate(model, X[train_idx], Y[train_idx], M[train_idx], cfg),
@@ -63,7 +63,7 @@ def fit(cfg, X, Y, M, splits):
     for split in ["train", "val", "test"]:
         r2 = results[split]["macro"].get("r2")
         if r2 is not None:
-            status = "" if split=="test" and r2>=0.85 else ""
+            status = "✅" if split=="test" and r2>=0.85 else ""
             print(f"{split.capitalize():<5} R²: {r2:.3f} {status}")
     print("="*60 + "\n")
     return results
