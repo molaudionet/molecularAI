@@ -1,0 +1,48 @@
+{
+  "train": {
+    "tasks": {
+      "measured log solubility in mols per litre": {
+        "r2": 0.0,
+        "rmse": 4.287499904632568,
+        "mae": 4.287499904632568
+      }
+    },
+    "macro": {
+      "r2": 0.0,
+      "mae": 4.287499904632568,
+      "rmse": 4.287499904632568
+    }
+  },
+  "val": {
+    "tasks": {
+      "measured log solubility in mols per litre": {
+        "r2": 0.0,
+        "rmse": 3.799999952316284,
+        "mae": 3.799999952316284
+      }
+    },
+    "macro": {
+      "r2": 0.0,
+      "mae": 3.799999952316284,
+      "rmse": 3.799999952316284
+    }
+  },
+  "test": {
+    "tasks": {
+      "measured log solubility in mols per litre": {
+        "r2": 0.0,
+        "rmse": 6.789999961853027,
+        "mae": 6.789999961853027
+      }
+    },
+    "macro": {
+      "r2": 0.0,
+      "mae": 6.789999961853027,
+      "rmse": 6.789999961853027
+    }
+  },
+  "train_X_shape": [
+    10,
+    7
+  ]
+}

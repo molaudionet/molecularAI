@@ -1,0 +1,36 @@
+##All User Guides and READMEs are in docs directroy
+###Please go to docs directory for more information
+
+##  Important Legal Clarifications
+
+### License Scope & Precedence
+
+This repository's MIT License applies **only** to the software code herein. 
+It operates alongside, and does not override:
+
+1. **Patent Rights:** U.S. Patents 9,018,506 and 10,381,108 protecting 
+   molecular sonification technology remain in full force. Commercial use 
+   requires patent license.
+
+2. **Website Terms:** If you access our technology via soundofmolecules.com, 
+   those Terms of Service apply to that service.
+
+3. **Other Repositories:** Each code repository has its own license - 
+   check individual LICENSE files.
+
+### What You CAN Do (MIT License):
+Use this code for research   
+Modify and distribute the code  
+Use in academic publications  
+Learn from the implementation  
+
+### What Requires Additional Permission:
+Commercial products using molecular sonification technology  
+Commercial services implementing patented methods  
+Integration into proprietary commercial software (patent license needed)  
+
+### Summary:
+**Code = MIT Licensed (free)**  
+**Technology = Patent Protected (commercial license required)**  
+
+They're separate and both apply.

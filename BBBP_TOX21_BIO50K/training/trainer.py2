@@ -1,0 +1,30 @@
+from __future__ import annotations
+from typing import Any, Dict
+import numpy as np
+
+from models.head import train_logreg_multitask, predict_proba
+from training.metrics import classification_metrics, multitask_summary
+
+def evaluate(model, X, Y, M) -> Dict[str, Any]:
+    prob = predict_proba(model, X)
+    per_task = {}
+    for j, name in enumerate(model.label_names):
+        per_task[name] = classification_metrics(Y[:, j], prob[:, j], M[:, j])
+    return {"per_task": per_task, "summary": multitask_summary(per_task)}
+
+def fit(cfg: Dict[str, Any], X: np.ndarray, Y: np.ndarray, M: np.ndarray, splits: Dict[str, np.ndarray]) -> Dict[str, Any]:
+    max_iter = int(cfg.get("train", {}).get("max_iter", 2000))
+    label_names = cfg["dataset"]["label_cols"]
+    task_types = cfg["dataset"]["task_types"]
+
+    model = train_logreg_multitask(
+        X[splits["train"]], Y[splits["train"]], M[splits["train"]],
+        label_names=label_names, task_types=task_types, max_iter=max_iter
+    )
+
+    return {
+        "model": model,
+        "train": evaluate(model, X[splits["train"]], Y[splits["train"]], M[splits["train"]]),
+        "val":   evaluate(model, X[splits["val"]],   Y[splits["val"]],   M[splits["val"]]),
+        "test":  evaluate(model, X[splits["test"]],  Y[splits["test"]],  M[splits["test"]]),
+    }

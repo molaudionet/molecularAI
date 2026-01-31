@@ -1,0 +1,54 @@
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Dict, List, Optional
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+
+@dataclass
+class TrainedModel:
+    label_names: List[str]
+    task_types: Dict[str, str]
+    models: Dict[str, object]        # per-label model (here logistic regression)
+    scaler_mean: np.ndarray
+    scaler_std: np.ndarray
+
+def standardize_fit(X: np.ndarray):
+    mean = X.mean(axis=0)
+    std = X.std(axis=0) + 1e-8
+    return mean, std
+
+def standardize_apply(X: np.ndarray, mean: np.ndarray, std: np.ndarray):
+    return (X - mean) / std
+
+def train_logreg_multitask(X: np.ndarray, Y: np.ndarray, M: np.ndarray,
+                           label_names: List[str], task_types: Dict[str, str],
+                           max_iter: int = 2000) -> TrainedModel:
+    mean, std = standardize_fit(X)
+    Xs = standardize_apply(X, mean, std)
+
+    models: Dict[str, object] = {}
+    for j, name in enumerate(label_names):
+        valid = M[:, j] > 0.5
+        if valid.sum() < 10:
+            models[name] = None
+            continue
+        yj = Y[valid, j].astype(int)
+        xj = Xs[valid]
+        clf = LogisticRegression(max_iter=max_iter, n_jobs=-1)
+        clf.fit(xj, yj)
+        models[name] = clf
+
+    return TrainedModel(label_names=label_names, task_types=task_types,
+                        models=models, scaler_mean=mean, scaler_std=std)
+
+def predict_proba(model: TrainedModel, X: np.ndarray) -> np.ndarray:
+    Xs = standardize_apply(X, model.scaler_mean, model.scaler_std)
+    N = X.shape[0]
+    T = len(model.label_names)
+    prob = np.zeros((N, T), dtype=np.float32)
+    for j, name in enumerate(model.label_names):
+        m = model.models.get(name)
+        if m is None:
+            continue
+        prob[:, j] = m.predict_proba(Xs)[:, 1].astype(np.float32)
+    return prob

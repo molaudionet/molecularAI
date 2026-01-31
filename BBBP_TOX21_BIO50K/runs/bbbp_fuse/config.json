@@ -1,0 +1,35 @@
+{
+  "train_mode": "fuse",
+  "dataset": {
+    "type": "csv",
+    "path": "data/bbbp.csv",
+    "id_col": "num",
+    "smiles_col": "smiles",
+    "label_cols": [
+      "p_np"
+    ],
+    "task_types": {
+      "p_np": "classification"
+    }
+  },
+  "run": {
+    "seed": 0,
+    "limit": 2051,
+    "split": {
+      "train": 0.8,
+      "val": 0.1,
+      "test": 0.1
+    }
+  },
+  "features": {
+    "featurizer": "rdkit_desc",
+    "cache_dir": "cache/bbbp_fuse",
+    "audio": {
+      "enabled": true,
+      "audio_dir": "cache/bbbp_audio/tmp_wavs",
+      "embed": {
+        "cache_path": "cache/bbbp_fuse/audio_embeddings.npy"
+      }
+    }
+  }
+}
