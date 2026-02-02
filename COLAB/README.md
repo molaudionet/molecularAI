@@ -1,10 +1,10 @@
-Here’s a complete “do-this-next” package:
+Here's a complete "do-this-next" package:
 
 Which GPU to rent (cheapest that works for your runs)
 
-A 1-page “how to run on Lambda” guide
+A 1-page "how to run on Lambda" guide
 
-A 1-page “how to run on RunPod” guide
+A 1-page "how to run on RunPod" guide
 
 A Docker setup (Dockerfile + compose) so your repo runs identically anywhere
 
@@ -13,13 +13,13 @@ A realistic cost-per-experiment estimate
 keep this focused on your workloads: wav2vec2 embedding, MFCC, PCA, Ridge training, caching.
 
 1) GPU choice: what you should rent
-If you want “works every time” + easy SSH VM
+If you want "works every time" + easy SSH VM
 
 Lambda GPU Cloud VM (best sanity)
 
 Pick: RTX 4090 (24GB) if available, otherwise A10 (24GB) or A100 40GB.
 
-Why: you’ll run python run*.py ... like local, persistent disk, no notebook weirdness.
+Why: you'll run python run*.py ... like local, persistent disk, no notebook weirdness.
 
 If you want cheapest/hour and can tolerate a little infra
 
@@ -35,7 +35,7 @@ MFCC experiments: GPU not required (CPU is fine).
 
 wav2vec2 embedding: GPU helps a lot; CPU is slow/painful.
 
-2) Lambda VM: “do this exactly” guide (SSH workflow)
+2) Lambda VM: "do this exactly" guide (SSH workflow)
 Create the instance
 
 Choose Ubuntu + a GPU (4090/A10/A100 depending on availability)
@@ -76,19 +76,19 @@ python tools/bootstrap_r2.py --npz runs/esol_fuse_mfcc_pca/test_preds.npz
 python run_wav2vec2.py fit --config configs/esol_fuse_wav2vec2_pca.yaml --outdir runs/esol_fuse_wav2vec2_pca
 python tools/bootstrap_r2.py --npz runs/esol_fuse_wav2vec2_pca/test_preds.npz
 
-3) RunPod: easiest “pod + persistent volume” setup
+3) RunPod: easiest "pod + persistent volume" setup
 
 RunPod pricing reference: GPUs from $0.34/hr (RTX 4090) and storage billed separately.
 
 Recommended setup
 
-Choose a RunPod “Pod” (on-demand GPU) with RTX 4090 or RTX 3090
+Choose a RunPod "Pod" (on-demand GPU) with RTX 4090 or RTX 3090
 
 Attach a persistent volume (so caches survive). Storage billed monthly (network volume rates documented).
 
 Inside the pod (same as Lambda)
 
-You’ll typically SSH or open web terminal, then run the same commands as above.
+You'll typically SSH or open web terminal, then run the same commands as above.
 
 Important: Put caches and runs on the persistent volume path, e.g.
 
@@ -103,7 +103,7 @@ features:
 
 4) Dockerize it so it runs anywhere identically
 
-This avoids “works on my machine” issues and makes GitHub supplementation stronger.
+This avoids "works on my machine" issues and makes GitHub supplementation stronger.
 
 Dockerfile (GPU-capable, works on Lambda/RunPod/local)
 
@@ -175,23 +175,23 @@ wav2vec2 embedding cost driver: embedding 1128 short clips.
 
 On a 4090, expect minutes-level to tens-of-minutes depending on implementation/batching.
 
-Total “full run” (embed + train + bootstrap) often fits within ~0.3–1.0 GPU-hours.
+Total "full run" (embed + train + bootstrap) often fits within ~0.3-1.0 GPU-hours.
 
 So ballpark:
 
-RTX 4090: 0.3–1.0 hr × $0.34/hr → $0.10–$0.34 per run
+RTX 4090: 0.3-1.0 hr × $0.34/hr → $0.10-$0.34 per run
 
-RTX 3090: 0.3–1.0 hr × $0.22/hr → $0.07–$0.22 per run
+RTX 3090: 0.3-1.0 hr × $0.22/hr → $0.07-$0.22 per run
 
-Even if you’re slower and it takes 2 GPU-hours:
+Even if you're slower and it takes 2 GPU-hours:
 
 4090: ~$0.68
 
 3090: ~$0.44
 
-That’s why I’m pushing RunPod for iteration.
+That's why I'm pushing RunPod for iteration.
 
-Quick “what should I do tomorrow morning?”
+Quick "what should I do tomorrow morning?"
 
 Use RunPod RTX 4090 for wav2vec2/PCA experiments; keep /workspace/cache persistent.
 
